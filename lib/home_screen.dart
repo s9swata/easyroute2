@@ -15,6 +15,7 @@ class HomeScreen extends StatelessWidget {
       extendBody: true,
       bottomNavigationBar: const SharedBottomNavBar(currentIndex: 0),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           // Main Scrollable Content
           SingleChildScrollView(
