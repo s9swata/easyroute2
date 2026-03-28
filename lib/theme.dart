@@ -7,6 +7,8 @@ class AppTheme {
   static const Color backgroundLight = Color(0xFFF5F7F8);
   static const Color backgroundDark = Color(0xFF101822);
   static const Color blue400 = Color(0xFF60A5FA);
+  static const Color blue500 = Color(0xFF3B82F6);
+  static const Color blue600 = Color(0xFF2563EB);
   
   // Slate Colors (Tailwind defaults)
   static const Color slate100 = Color(0xFFF1F5F9);
@@ -15,10 +17,13 @@ class AppTheme {
   static const Color slate400 = Color(0xFF94A3B8);
   static const Color red400 = Color(0xFFF87171);
   static const Color green100 = Color(0xFFDCFCE7);
+  static const Color green500 = Color(0xFF22C55E);
+  static const Color green600 = Color(0xFF16A34A);
   static const Color green700 = Color(0xFF15803D);
   static const Color yellow100 = Color(0xFFFEF08A);
   static const Color yellow700 = Color(0xFFA16207);
   static const Color slate500 = Color(0xFF64748B);
+  static const Color slate600 = Color(0xFF475569);
   static const Color slate700 = Color(0xFF334155);
   static const Color slate800 = Color(0xFF1E293B);
   static const Color slate900 = Color(0xFF0F172A);

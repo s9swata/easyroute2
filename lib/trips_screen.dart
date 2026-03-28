@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'theme.dart';
 import 'bottom_nav_bar.dart';
 
-class TripsScreen extends StatelessWidget {
+class TripsScreen extends StatefulWidget {
   const TripsScreen({super.key});
+
+  @override
+  State<TripsScreen> createState() => _TripsScreenState();
+}
+
+class _TripsScreenState extends State<TripsScreen> {
+  int _currentTab = 0; // 0: Ongoing, 1: Upcoming, 2: History
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +23,24 @@ class TripsScreen extends StatelessWidget {
           // Main Scrollable Content
           SingleChildScrollView(
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 116.0, // Header (56) + Tabs (48) + extra space
-              bottom: 120.0 + MediaQuery.of(context).padding.bottom, // Bottom Nav
+              top: MediaQuery.of(context).padding.top + 130.0,
+              bottom: 120.0 + MediaQuery.of(context).padding.bottom,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTodaySection(),
-                _buildTomorrowSection(),
-              ],
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 800),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_currentTab == 0) ...[
+                      _buildActiveTripSection(),
+                      _buildOtherTripsSection(),
+                    ],
+                    if (_currentTab == 1) _buildUpcomingTabSection(),
+                    if (_currentTab == 2) _buildHistoryTabSection(),
+                  ],
+                ),
+              ),
             ),
           ),
 
@@ -35,7 +51,6 @@ class TripsScreen extends StatelessWidget {
             right: 0,
             child: _buildHeader(context),
           ),
-
         ],
       ),
     );
@@ -44,465 +59,744 @@ class TripsScreen extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppTheme.backgroundLight,
+        color: Colors.white,
         border: Border(
           bottom: BorderSide(color: AppTheme.slate200),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Top bar
-          Padding(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16.0,
-              left: 16.0,
-              right: 16.0,
-              bottom: 16.0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => Navigator.of(context).pop(), // Functional back button disguised as menu, or just return. Let's make it pop.
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.menu, color: AppTheme.slate900, size: 24),
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      'My Trips',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.slate900,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.calendar_today_outlined, color: AppTheme.slate900, size: 24),
-                ),
-              ],
-            ),
-          ),
-          
-          // Tabs
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: AppTheme.primary, width: 3.0),
-                    ),
-                  ),
-                  child: const Text(
-                    'Upcoming',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 32),
-                Container(
-                  padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
-                  child: const Text(
-                    'Past',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.slate500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTodaySection() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'TODAY',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.slate900,
-              letterSpacing: 1.0, // tracking-wider
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildExpandedTripCard(),
-          const SizedBox(height: 16),
-          _buildCollapsedTripCard(
-            tripId: 'TRIP ID: ER-9945 • Regular',
-            title: 'Login — 08:30 AM',
-            icon: Icons.directions_car_outlined,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTomorrowSection() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'TOMORROW',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.slate900,
-              letterSpacing: 1.0,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildCollapsedTripCard(
-            tripId: 'TRIP ID: ER-1002 • Ad-hoc',
-            title: 'Logout — 05:30 PM',
-            icon: Icons.logout_outlined,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExpandedTripCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12), // rounded-xl
-        border: Border.all(color: AppTheme.slate200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4, // shadow-sm
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          // Map Header
-          Container(
-            width: double.infinity,
-            height: 150, // aspect-[21/9] roughly
-            decoration: const BoxDecoration(
-              color: AppTheme.slate200,
-              image: DecorationImage(
-                image: AssetImage('assets/images/trip_map.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFDCFCE7), // green-100
-                      borderRadius: BorderRadius.circular(4), // rounded
-                    ),
-                    child: const Text(
-                      'ACCEPTED',
-                      style: TextStyle(
-                        fontSize: 12, // text-xs
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF15803D), // green-700
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Content
-          Padding(
-            padding: const EdgeInsets.all(16.0), // p-4
+      child: SafeArea(
+        bottom: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'TRIP ID: ER-9921',
+                // Top bar
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: Icon(Icons.arrow_back, color: AppTheme.slate900, size: 24),
+                          ),
+                        ),
+                      ),
+                      const Expanded(
+                        child: Text(
+                          'My Trips',
                           style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.slate500,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.slate900,
                             letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Logout — 06:00 PM',
+                      ),
+                      const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Icon(Icons.search, color: AppTheme.slate900, size: 24),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Tabs
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => setState(() => _currentTab = 0),
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: _currentTab == 0 ? AppTheme.primary : Colors.transparent, 
+                                width: 3.0,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Ongoing',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: _currentTab == 0 ? FontWeight.bold : FontWeight.w600,
+                              color: _currentTab == 0 ? AppTheme.primary : AppTheme.slate500,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 32),
+                      GestureDetector(
+                        onTap: () => setState(() => _currentTab = 1),
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: _currentTab == 1 ? AppTheme.primary : Colors.transparent, 
+                                width: 3.0,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Upcoming',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: _currentTab == 1 ? FontWeight.bold : FontWeight.w600,
+                              color: _currentTab == 1 ? AppTheme.primary : AppTheme.slate500,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 32),
+                      GestureDetector(
+                        onTap: () => setState(() => _currentTab = 2),
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: _currentTab == 2 ? AppTheme.primary : Colors.transparent, 
+                                width: 3.0,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'History',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: _currentTab == 2 ? FontWeight.bold : FontWeight.w600,
+                              color: _currentTab == 2 ? AppTheme.primary : AppTheme.slate500,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveTripSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Active Trip',
+                style: TextStyle(
+                  color: AppTheme.slate900,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.green100,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'IN PROGRESS',
+                  style: TextStyle(
+                    color: AppTheme.green700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppTheme.slate100),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                _buildMapHeader(),
+                _buildTripDetails(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMapHeader() {
+    return SizedBox(
+      height: 192,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/trip_map.jpg',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(color: AppTheme.slate200),
+          ),
+          Container(
+            color: AppTheme.primary.withValues(alpha: 0.05),
+          ),
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Live Tracking',
+                    style: TextStyle(
+                      color: AppTheme.slate700,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTripDetails() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'VEHICLE DETAILS',
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'KA-01-MG-1234',
+                    style: TextStyle(
+                      color: AppTheme.slate900,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Toyota Innova • White',
+                    style: TextStyle(
+                      color: AppTheme.slate500,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                constraints: const BoxConstraints(minWidth: 80),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      'OTP',
+                      style: TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const Text(
+                      '1234',
+                      style: TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(color: AppTheme.slate100),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'ETA TO PICKUP',
+                      style: TextStyle(
+                        color: AppTheme.slate500,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: const [
+                        Icon(Icons.schedule, color: AppTheme.primary, size: 20),
+                        SizedBox(width: 6),
+                        Text(
+                          '12 mins',
                           style: TextStyle(
-                            fontSize: 20, // text-xl
-                            fontWeight: FontWeight.bold,
                             color: AppTheme.slate900,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    const Icon(Icons.expand_less, color: AppTheme.slate400),
                   ],
                 ),
-                const SizedBox(height: 16),
-                
-                // Details Grid
-                Container(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Color(0xFFF1F5F9)), // border-slate-100
+              ),
+              Container(width: 1, height: 32, color: AppTheme.slate200),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'DRIVER',
+                      style: TextStyle(
+                        color: AppTheme.slate500,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
                     ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: const [
+                        Icon(Icons.person, color: AppTheme.slate600, size: 20),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Rajesh Kumar',
+                            style: TextStyle(
+                              color: AppTheme.slate900,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 48,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 2,
+                      ),
+                    ],
                   ),
                   child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildGridItem('Booking Type', 'Regular'),
-                            const SizedBox(height: 16),
-                            _buildGridItem('Pickup Seq', '2nd Drop-off'),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildGridItem('Office', 'Main Campus HQ'),
-                            const SizedBox(height: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'ETA',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppTheme.slate500,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'N/A',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.slate900.withValues(alpha: 0.6), // opacity-60
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.map, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Track on Map',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 44, // h-11
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary,
-                          borderRadius: BorderRadius.circular(8), // rounded-lg
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: const Text(
-                          'View Route',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF2F2), // red-50
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFFECACA)), // red-200
-                        ),
-                        child: const Text(
-                          'Cancel Trip',
-                          style: TextStyle(
-                            color: Color(0xFFDC2626), // red-600
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGridItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppTheme.slate500,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14, // text-sm
-            fontWeight: FontWeight.w600, // font-semibold
-            color: AppTheme.slate900,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCollapsedTripCard({required String tripId, required String title, required IconData icon}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.slate200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  width: 48, // size-12
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
                   height: 48,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1), // bg-primary/10
+                    color: Colors.white,
+                    border: Border.all(color: AppTheme.primary, width: 2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: AppTheme.primary, size: 24),
-                ),
-                const SizedBox(width: 16), // gap-4
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 16, // text-base
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.slate900,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8), // gap-2
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), // px-1.5 py-0.5
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFDCFCE7), // green-100
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'ACCEPTED',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF15803D), // green-700
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.location_on, color: AppTheme.primary, size: 20),
+                      SizedBox(width: 8),
                       Text(
-                        tripId,
-                        style: const TextStyle(
-                          fontSize: 12, // text-xs
-                          color: AppTheme.slate500,
+                        "I've Reached",
+                        style: TextStyle(
+                          color: AppTheme.primary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOtherTripsSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Other Trips',
+                style: TextStyle(
+                  color: AppTheme.slate900,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              Text(
+                'See All',
+                style: TextStyle(
+                  color: AppTheme.primary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Evening Login',
+            timeInfo: 'Today • 6:30 PM',
+            icon: Icons.commute,
+            status: 'Vehicle Allocated',
+            statusColor: AppTheme.blue500,
+            statusTextColor: AppTheme.blue600,
+            trailingIcon: Icons.chevron_right,
+            iconColor: AppTheme.primary,
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Morning Pickup',
+            timeInfo: 'Tomorrow • 8:00 AM',
+            icon: Icons.event,
+            status: 'Awaiting Allocation',
+            statusColor: AppTheme.slate300,
+            statusTextColor: AppTheme.slate500,
+            trailingIcon: Icons.lock,
+            iconColor: AppTheme.slate400,
+            opacity: 0.75,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpcomingTripCard({
+    required String title,
+    required String timeInfo,
+    required IconData icon,
+    required String status,
+    required Color statusColor,
+    required Color statusTextColor,
+    required IconData trailingIcon,
+    required Color iconColor,
+    double opacity = 1.0,
+  }) {
+    return Opacity(
+      opacity: opacity,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.slate100),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppTheme.slate100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: iconColor, size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppTheme.slate900,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    timeInfo,
+                    style: const TextStyle(
+                      color: AppTheme.slate500,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        status.toUpperCase(),
+                        style: TextStyle(
+                          color: statusTextColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Icon(trailingIcon, color: AppTheme.slate400),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpcomingTabSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Upcoming Trips',
+            style: TextStyle(
+              color: AppTheme.slate900,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
             ),
           ),
-          const Icon(Icons.expand_more, color: AppTheme.slate400),
+          const SizedBox(height: 16),
+          _buildUpcomingTripCard(
+            title: 'Evening Login',
+            timeInfo: 'Today • 6:30 PM',
+            icon: Icons.commute,
+            status: 'Vehicle Allocated',
+            statusColor: AppTheme.blue500,
+            statusTextColor: AppTheme.blue600,
+            trailingIcon: Icons.chevron_right,
+            iconColor: AppTheme.primary,
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Morning Pickup',
+            timeInfo: 'Tomorrow • 8:00 AM',
+            icon: Icons.event,
+            status: 'Awaiting Allocation',
+            statusColor: AppTheme.slate300,
+            statusTextColor: AppTheme.slate500,
+            trailingIcon: Icons.lock,
+            iconColor: AppTheme.slate400,
+            opacity: 0.75,
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Evening Login',
+            timeInfo: 'Tomorrow • 6:30 PM',
+            icon: Icons.commute,
+            status: 'Awaiting Allocation',
+            statusColor: AppTheme.slate300,
+            statusTextColor: AppTheme.slate500,
+            trailingIcon: Icons.lock,
+            iconColor: AppTheme.slate400,
+            opacity: 0.75,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistoryTabSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Past Trips',
+            style: TextStyle(
+              color: AppTheme.slate900,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildUpcomingTripCard(
+            title: 'Morning Pickup',
+            timeInfo: 'Yesterday • 8:15 AM',
+            icon: Icons.check_circle_outline,
+            status: 'Completed',
+            statusColor: AppTheme.green500,
+            statusTextColor: AppTheme.green700,
+            trailingIcon: Icons.chevron_right,
+            iconColor: AppTheme.green600,
+            opacity: 0.8,
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Evening Login',
+            timeInfo: 'Yesterday • 6:40 PM',
+            icon: Icons.check_circle_outline,
+            status: 'Completed',
+            statusColor: AppTheme.green500,
+            statusTextColor: AppTheme.green700,
+            trailingIcon: Icons.chevron_right,
+            iconColor: AppTheme.green600,
+            opacity: 0.8,
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Morning Pickup',
+            timeInfo: 'Mon, 23 Mar • 8:00 AM',
+            icon: Icons.cancel_outlined,
+            status: 'Skipped',
+            statusColor: AppTheme.slate400,
+            statusTextColor: AppTheme.slate600,
+            trailingIcon: Icons.chevron_right,
+            iconColor: AppTheme.slate400,
+            opacity: 0.6,
+          ),
+          const SizedBox(height: 12),
+          _buildUpcomingTripCard(
+            title: 'Evening Login',
+            timeInfo: 'Mon, 23 Mar • 6:30 PM',
+            icon: Icons.check_circle_outline,
+            status: 'Completed',
+            statusColor: AppTheme.green500,
+            statusTextColor: AppTheme.green700,
+            trailingIcon: Icons.chevron_right,
+            iconColor: AppTheme.green600,
+            opacity: 0.8,
+          ),
         ],
       ),
     );

@@ -36,3 +36,20 @@ The "Trip Stats" screen exudes a crisp, data-driven, and utilitarian atmosphere.
 * **Alignment & Whitespace:** Relies heavily on flexbox (`flex-col`, `gap-4`, `gap-2`) for consistent vertical rhythm. Content is padded generously (`p-4` to `p-6`) to create distinct, breathable islands of information.
 * **Sectioning:** The "No-Line" rule is heavily modified here; the design actively uses subtle 1px borders (`border-b border-slate-200`) and slight background color shifts (White to Light Canvas) to separate the Calendar, the Chart, and the List Views rigidly. This compartmentalization is standard for dense analytical dashboards.
 * **Constraints:** Built initially for mobile proportions (Device Type: MOBILE, Width: 780), utilizing a single-column stacked flow that relies on vertical scrolling while keeping critical navigation and context (App Bar) sticky.
+
+# Design System: Trips Screen (Upcoming Trips - Allocated)
+**Screen ID:** 421b140cdcef4aee85f3b2d5e275b907
+
+## 1. Visual Theme & Atmosphere
+The Trips Screen offers a task-centric, action-oriented view. It clearly separates immediate, urgent context (The "Active Trip" card with map tracking) from future context (The "Other Trips" list). The heavy reliance on cards with shadows and distinct boundaries ensures that complex trip data is compartmentalized.
+
+## 2. Component Stylings
+* **Top Navigation Tabs:** Underlined indicator (`border-b-[3px] border-primary`) for the active tab ("Ongoing"). Inactive tabs use transparent borders and `slate-500` text.
+* **Active Trip Card:** The hero component of the screen. 
+  * Features an embedded, 150px-high map graphic with an overlaid "Live Tracking" pill (`bg-white shadow-lg` containing a pulsing primary dot).
+  * Employs partitioned sections using `border-y border-slate-100` to separate high-level vehicle info from driver/ETA details.
+  * OTP display uses a high-contrast inverted block (`bg-primary/10 text-primary uppercase font-black tracking-widest`).
+* **Twin Action Buttons:** A `grid grid-cols-2 gap-3` setup. 
+  * Primary Action ("Track on Map"): Filled `bg-primary text-white`.
+  * Secondary Action ("I've Reached"): Outlined `border-2 border-primary text-primary bg-white`.
+* **Other Trips Cards:** Simple row-based cards featuring a leading large icon (`size-12 rounded-lg bg-slate-100`). Secondary text provides relative time context ("Today • 6:30 PM"). Includes colored status dots (Blue = Allocated, Gray = Awaiting). Inactive future trips use slight opacity (`opacity-75`).
