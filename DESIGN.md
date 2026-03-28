@@ -1,31 +1,38 @@
-# Design System: EasyRoute Home
+# Design System: Home Screen (Trip Stats)
 **Project ID:** 14856533701645627154
 
 ## 1. Visual Theme & Atmosphere
-The design system for EasyRoute represents a **"Modern Corporate Travel Assistant."** It is clean, functional, and approachable. The aesthetic is airy and spacious, avoiding dense information blocks in favor of clear, distinct interactive areas. The vibe is utilitarian yet polished, utilizing soft gradients and rounded geometry to soften the inherently rigid nature of travel logistics.
+The "Trip Stats" screen exudes a crisp, data-driven, and utilitarian atmosphere. It is designed for clarity and rapid information digestion, blending a light, airy background with dense, high-contrast information blocks. The aesthetic is professional yet approachable, relying on a clean card-based layout with distinct visual hierarchy to guide the user's eye from high-level summaries (the calendar and bar chart) down to granular details (individual bookings).
 
 ## 2. Color Palette & Roles
-*   **Vibrant Blue (`#0f6df0`):** The `primary` color. Used for key interactive elements, the main gradient, active navigation states, and highlighting the primary brand identity.
-*   **Airy Gray-Blue (`#f5f7f8`):** The `background-light` color. Provides a clean, slightly cool canvas for the application in light mode, ensuring content cards pop.
-*   **Deep Space Navy (`#101822`):** The `background-dark` color. A rich, dark background for dark mode that maintains a professional feel over pure black.
-*   **Soft White (`#ffffff`):** Used for foreground cards and the chat input container, creating separation from the canvas.
-*   **Slate 900 (`#0f172a`):** Primary text color in light mode for high legibility.
-*   **Slate 500 (`#64748b`):** Secondary text color for subtitles and less critical information.
-*   **Subtle Border Gray (`#e2e8f0`):** Used for defining edges of cards and inputs without heavy contrast.
+* **Primary Utility Blue** (#0f6df0): Used for primary accents, active states, active chart bars, and the "Export" button. It commands attention and indicates interactivity and progress.
+* **Base Surface Light** (#ffffff): Used for interactive cards, sticky headers, and distinct content sections.
+* **Background Light Canvas** (#f5f7f8): Serves as the primary viewport background, providing subtle contrast against the white content cards to delineate sections.
+* **Deep Ink Slate** (#0f172a / text-slate-900): The primary color for high-emphasis text, headers, and major data points (e.g., "128" total trips).
+* **Muted Ash Gray** (#64748b / text-slate-500): Used for secondary text, labels, calendar inactive dates, and subtle borders.
+* **Alert Crimson** (#f87171 / bg-red-400): A crucial semantic color used exclusively to represent "No-shows" in the chart and alerts.
+* **Soft Chart Gray** (#cbd5e1 / bg-slate-300): Used to represent "Scheduled" items in the bar chart, providing a neutral baseline against the vibrant active colors.
+* **Success Green Tint** (#dcfce7 / bg-green-100): Used as a background for "Confirmed" status pills to offer positive reinforcement.
+* **Warning Yellow Tint** (#fef08a / bg-yellow-100): Used as a background for "Pending" status pills to indicate pending action.
 
 ## 3. Typography Rules
-*   **Font Family:** **Inter**, a clean, geometric sans-serif that ensures high legibility on mobile devices.
-*   **Display/Headlines:** Used in bold (`font-bold`, `font-semibold`) with tight letter spacing (`tracking-tight`). The main hero greeting ("Hello, Alex") is very large (`text-5xl`).
-*   **Body Text:** Standard weights with standard line heights, ensuring readability.
-*   **Labels/Microcopy:** Found in the bottom navigation and the AI disclaimer (`text-[10px]`, `text-xs`), used to provide necessary context without drawing excessive attention.
+* **Font Family:** Inter (Sans-Serif). Chosen for its high legibility and precise geometric proportions, perfect for data dashboards.
+* **Headlines & Display:** Uses bold weights (700) with tight tracking to anchor sections (e.g., `text-3xl font-bold` for large stats, `text-xl font-bold tracking-tight` for section headers).
+* **Body & Labels:** Uses regular to medium weights (400-500). Standard body text is `text-sm`, while dense data labels and calendar days use `font-bold text-xs`.
+* **Micro-copy (Pills & Tags):** Uppercase with generous letter-spacing (`text-[10px] font-bold uppercase`) to ensure small labels are highly readable and distinct from standard paragraph text.
 
 ## 4. Component Stylings
-*   **Action Tiles (Cards):** Shape is `rounded-2xl` (generously rounded corners), with a white background and a subtle `shadow-sm`. They feature a soft border that transitions to `primary` on interaction.
-*   **Icon Containers:** Inner icons inside cards use `rounded-xl` with a heavily tinted primary background (`bg-primary/10`), providing a soft, pillowy resting place for the iconography.
-*   **AI Input Field:** Acts as a floating central focal point. It uses `rounded-2xl`, sits on a `shadow-xl` (heavy, diffused shadow), and includes a subtle, expanding gradient glow (`blur opacity-20`).
-*   **Buttons (Circular):** Quick actions (history, settings) use `rounded-full` (perfectly circular) with subtle hover state background shifts. The main send button is `rounded-xl` and uses solid `primary`.
+* **Top App Bar:** Flat, sticky, utilizing a bottom border (`border-slate-200`) rather than a shadow, maintaining a flush, modern look.
+* **Buttons:** 
+  * "Export" button uses a prominent tinted background (`bg-primary/10`) with primary colored text, featuring softly rounded edges (`rounded-lg` / `0.5rem`).
+* **Cards/Containers (Adhoc Bookings):** 
+  * Appear distinctly lifted using a subtle shadow (`shadow-sm`), a fine border (`border-slate-100`), and generously rounded corners (`rounded-xl` / `0.75rem`).
+  * Inner avatars use perfectly circular geometry (`rounded-full` / `9999px`) to contrast with the rectangular cards.
+* **Data Visualizations (Bar Chart):** 
+  * Bars are stacked vertically inside a fixed height container (`h-48`). Each segment utilizes absolute widths and percentage heights, topped with rounded upper corners (`rounded-t`), making the data physically relatable and approachable.
+* **Status Pills:** Pill-shaped (`rounded-full`) with highly specific semantic coloring (tinted backgrounds with bold, darker text of the same hue family) for instant cognitive recognition.
 
 ## 5. Layout Principles
-*   **Vertical Flow:** The layout is a straightforward vertical column (`flex-col`) with generous padding (`p-4`, `py-12`) to allow elements to breathe.
-*   **Sticky Elements:** Both the top header and bottom navigation bar are sticky with a `backdrop-blur-md` and `backdrop-blur-lg` frosted glass effect, ensuring they are always accessible while maintaining context of the scrollable content beneath.
-*   **Grid Systems:** Quick action tiles utilize a responsive grid (`grid-cols-1 sm:grid-cols-3`), spacing items evenly with a standard `gap-4`.
+* **Alignment & Whitespace:** Relies heavily on flexbox (`flex-col`, `gap-4`, `gap-2`) for consistent vertical rhythm. Content is padded generously (`p-4` to `p-6`) to create distinct, breathable islands of information.
+* **Sectioning:** The "No-Line" rule is heavily modified here; the design actively uses subtle 1px borders (`border-b border-slate-200`) and slight background color shifts (White to Light Canvas) to separate the Calendar, the Chart, and the List Views rigidly. This compartmentalization is standard for dense analytical dashboards.
+* **Constraints:** Built initially for mobile proportions (Device Type: MOBILE, Width: 780), utilizing a single-column stacked flow that relies on vertical scrolling while keeping critical navigation and context (App Bar) sticky.

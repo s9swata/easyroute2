@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'theme.dart';
 import 'home_screen.dart';
 import 'trips_screen.dart';
+import 'stats_screen.dart';
 import 'profile_screen.dart';
 
 class SharedBottomNavBar extends StatelessWidget {
@@ -22,8 +23,8 @@ class SharedBottomNavBar extends StatelessWidget {
         targetScreen = const TripsScreen();
         break;
       case 2:
-        // History screen not implemented yet
-        return;
+        targetScreen = const StatsScreen();
+        break;
       case 3:
         targetScreen = const ProfileScreen();
         break;
@@ -84,8 +85,8 @@ class SharedBottomNavBar extends StatelessWidget {
                 onTap: () => _onTabTapped(context, 1),
               ),
               _buildNavItem(
-                icon: Icons.history,
-                label: 'History',
+                icon: Icons.bar_chart,
+                label: 'Stats',
                 isSelected: currentIndex == 2,
                 onTap: () => _onTabTapped(context, 2),
               ),
