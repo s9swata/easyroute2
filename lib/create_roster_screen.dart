@@ -15,14 +15,19 @@ class CreateRosterScreen extends StatelessWidget {
             _buildTopBar(context),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 120), // Padding for the bottom sticky button
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Trip Direction
-                      _buildSectionTitle('Trip Direction'),
+                padding: const EdgeInsets.only(
+                  bottom: 180,
+                ), // Increased padding for the bottom sticky button
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Trip Direction
+                          _buildSectionTitle('Trip Direction'),
                       const SizedBox(height: 12),
                       _buildTripDirectionSelector(),
                       const SizedBox(height: 24),
@@ -52,6 +57,8 @@ class CreateRosterScreen extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ),
           ],
         ),
       ),
@@ -68,9 +75,12 @@ class CreateRosterScreen extends StatelessWidget {
           bottom: BorderSide(color: AppTheme.slate200, width: 1.0),
         ),
       ),
-      child: Row(
-        children: [
-          Material(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Row(
+            children: [
+              Material(
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
@@ -101,6 +111,8 @@ class CreateRosterScreen extends StatelessWidget {
             child: Icon(Icons.more_vert, color: AppTheme.slate900, size: 24),
           ),
         ],
+      ),
+    ),
       ),
     );
   }
@@ -231,8 +243,10 @@ class CreateRosterScreen extends StatelessWidget {
       {'label': 'S', 'selected': true},
     ];
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      spacing: 12.0,
+      runSpacing: 12.0,
+      alignment: WrapAlignment.start,
       children: days.map((day) {
         final isSelected = day['selected'] as bool;
         return Container(

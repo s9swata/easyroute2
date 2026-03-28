@@ -22,17 +22,22 @@ class HomeScreen extends StatelessWidget {
               top: 56.0 + 24.0, // Reduced from 48.0 to bring content higher
               left: 16.0,
               right: 16.0,
-              bottom: 220.0, // extra padding for bottom AI box + nav
+              bottom: 260.0, // extra padding for bottom AI box + nav
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeroSection(),
-                const SizedBox(height: 16.0), // Reduced from 24.0
-                _buildQuickActions(
-                  context,
-                ), // ADDITION ONLY — pass context for navigation
-              ],
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 800),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeroSection(),
+                    const SizedBox(height: 16.0), // Reduced from 24.0
+                    _buildQuickActions(
+                      context,
+                    ), // ADDITION ONLY — pass context for navigation
+                  ],
+                ),
+              ),
             ),
           ),
 
@@ -42,7 +47,14 @@ class HomeScreen extends StatelessWidget {
                 12, // Reduced from 60 because bottomNavigationBar manages its own space now
             left: 0,
             right: 0,
-            child: SafeArea(child: _buildAITextBox()),
+            child: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: _buildAITextBox(),
+                ),
+              ),
+            ),
           ),
 
           // Top Header (Sticky)
@@ -64,62 +76,67 @@ class HomeScreen extends StatelessWidget {
             right: 16.0,
             bottom: 16.0,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Logo & Title
-              Row(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: AppTheme.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.route_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                  // Logo & Title
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.route_outlined,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'EasyRoute',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                          color: AppTheme.slate900,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'EasyRoute',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
-                      color: AppTheme.slate900,
-                    ),
+                  // Actions & Avatar
+                  Row(
+                    children: [
+                      _buildIconButton(Icons.history),
+                      const SizedBox(width: 8),
+                      _buildIconButton(Icons.settings_outlined),
+                      const SizedBox(width: 12), // ml-1 + gap
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppTheme.primary.withValues(alpha: 0.2),
+                            width: 2,
+                          ),
+                          image: const DecorationImage(
+                            image: AssetImage('assets/images/profile.jpg'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              // Actions & Avatar
-              Row(
-                children: [
-                  _buildIconButton(Icons.history),
-                  const SizedBox(width: 8),
-                  _buildIconButton(Icons.settings_outlined),
-                  const SizedBox(width: 12), // ml-1 + gap
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.primary.withValues(alpha: 0.2),
-                        width: 2,
-                      ),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/images/profile.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -424,8 +441,8 @@ class HomeScreen extends StatelessWidget {
               'EasyRoute AI may provide inaccurate travel information. Check important flight and hotel details.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10, // Slightly smaller text
-                color: AppTheme.slate400,
+                fontSize: 12, // Slightly increased from 10
+                color: AppTheme.slate500, // Better contrast
               ),
             ),
           ),
