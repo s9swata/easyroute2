@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'home_screen.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -24,7 +25,18 @@ class StatsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Row(
                     children: [
-                      const Icon(Icons.arrow_back, color: AppTheme.slate900, size: 28),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: AppTheme.slate900, size: 28),
+                        onPressed: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                            );
+                          }
+                        },
+                      ),
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
@@ -37,19 +49,29 @@ class StatsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          'EXPORT',
-                          style: TextStyle(
-                            color: AppTheme.primary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                      GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Exporting trip statistics...'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'EXPORT',
+                            style: TextStyle(
+                              color: AppTheme.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'home_screen.dart';
 import 'bottom_nav_bar.dart';
 
 class TripsScreen extends StatefulWidget {
@@ -81,7 +82,15 @@ class _TripsScreenState extends State<TripsScreen> {
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(20),
-                          onTap: () => Navigator.of(context).pop(),
+                          onTap: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              );
+                            }
+                          },
                           child: const SizedBox(
                             width: 40,
                             height: 40,

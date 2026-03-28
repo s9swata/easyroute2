@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'theme.dart';
-import 'create_roster_screen.dart'; // ADDITION ONLY — existing code unchanged
-import 'trips_screen.dart'; // ADDITION ONLY — existing code unchanged
+import 'create_roster_screen.dart';
+import 'trips_screen.dart';
+import 'stats_screen.dart';
+import 'profile_screen.dart';
 import 'bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -19,8 +21,8 @@ class HomeScreen extends StatelessWidget {
         children: [
           // Main Scrollable Content
           SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              top: 56.0 + 24.0, // Reduced from 48.0 to bring content higher
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 80.0, // Dynamic padding to prevent overlap
               left: 16.0,
               right: 16.0,
               bottom: 260.0, // extra padding for bottom AI box + nav
@@ -52,7 +54,7 @@ class HomeScreen extends StatelessWidget {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 800),
-                  child: _buildAITextBox(),
+                  child: _buildAITextBox(context),
                 ),
               ),
             ),
@@ -114,9 +116,15 @@ class HomeScreen extends StatelessWidget {
                   // Actions & Avatar
                   Row(
                     children: [
-                      _buildIconButton(Icons.history),
+                      _buildIconButton(
+                        Icons.history,
+                        onTap: () => _navigateToStats(context),
+                      ),
                       const SizedBox(width: 8),
-                      _buildIconButton(Icons.settings_outlined),
+                      _buildIconButton(
+                        Icons.settings_outlined,
+                        onTap: () => _navigateToProfile(context),
+                      ),
                       const SizedBox(width: 12), // ml-1 + gap
                       Container(
                         width: 40,
@@ -144,13 +152,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIconButton(IconData icon) {
+  Widget _buildIconButton(IconData icon, {VoidCallback? onTap}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         hoverColor: AppTheme.slate200,
-        onTap: () {},
+        onTap: onTap ?? () {},
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Icon(icon, color: AppTheme.slate900, size: 24),
@@ -251,6 +259,62 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  void _navigateToStats(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 300),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const StatsScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curve = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          );
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.05),
+              end: Offset.zero,
+            ).animate(curve),
+            child: FadeTransition(
+              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(curve),
+              child: child,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _navigateToProfile(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 300),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const ProfileScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curve = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          );
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.05),
+              end: Offset.zero,
+            ).animate(curve),
+            child: FadeTransition(
+              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(curve),
+              child: child,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildQuickActions(BuildContext context) {
     // ADDITION ONLY — accepted context
     return Column(
@@ -265,10 +329,13 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        _buildActionTile(
-          icon: Icons.analytics_outlined,
-          title: 'View Stats',
-          subtitle: 'Analyze travel costs and efficiency',
+        GestureDetector(
+          onTap: () => _navigateToStats(context),
+          child: _buildActionTile(
+            icon: Icons.analytics_outlined,
+            title: 'View Stats',
+            subtitle: 'Analyze travel costs and efficiency',
+          ),
         ),
         const SizedBox(height: 8),
         GestureDetector(
@@ -349,7 +416,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAITextBox() {
+  Widget _buildAITextBox(BuildContext context) {
     return Container(
       color: AppTheme.backgroundLight,
       padding: const EdgeInsets.symmetric(
@@ -421,11 +488,16 @@ class HomeScreen extends StatelessWidget {
                             Icons.arrow_upward,
                             color: Colors.white,
                             size: 16,
-                          ), // Arrow icon & smaller size
-                          onPressed: () {},
-                          padding: const EdgeInsets.all(
-                            4,
-                          ), // Even smaller padding
+                          ),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Message sent to AI assistant'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          },
+                          padding: const EdgeInsets.all(4),
                           constraints: const BoxConstraints(),
                         ),
                       ),

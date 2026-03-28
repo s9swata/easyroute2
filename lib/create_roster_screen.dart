@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'home_screen.dart';
 
-class CreateRosterScreen extends StatelessWidget {
+class CreateRosterScreen extends StatefulWidget {
   const CreateRosterScreen({super.key});
+
+  @override
+  State<CreateRosterScreen> createState() => _CreateRosterScreenState();
+}
+
+class _CreateRosterScreenState extends State<CreateRosterScreen> {
+  String _selectedDirection = 'Both';
+  final Set<int> _selectedDays = {5, 6}; // Default to Sat, Sun
+
+  void _toggleDay(int index) {
+    setState(() {
+      if (_selectedDays.contains(index)) {
+        _selectedDays.remove(index);
+      } else {
+        _selectedDays.add(index);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,37 +47,37 @@ class CreateRosterScreen extends StatelessWidget {
                         children: [
                           // Trip Direction
                           _buildSectionTitle('Trip Direction'),
-                      const SizedBox(height: 12),
-                      _buildTripDirectionSelector(),
-                      const SizedBox(height: 24),
-                      
-                      // Office Location
-                      _buildOfficeLocation(),
-                      const SizedBox(height: 24),
-                      
-                      // Weekly Offs
-                      _buildSectionTitle('Weekly Offs'),
-                      const SizedBox(height: 12),
-                      _buildWeeklyOffs(),
-                      const SizedBox(height: 24),
-                      
-                      // Dates
-                      _buildDateSelection(),
-                      const SizedBox(height: 24),
-                      
-                      // Times
-                      _buildTimeSelection(),
-                      const SizedBox(height: 24),
-                      
-                      // Locations
-                      _buildLocationSelection(),
-                    ],
+                          const SizedBox(height: 12),
+                          _buildTripDirectionSelector(),
+                          const SizedBox(height: 24),
+
+                          // Office Location
+                          _buildOfficeLocation(),
+                          const SizedBox(height: 24),
+
+                          // Weekly Offs
+                          _buildSectionTitle('Weekly Offs'),
+                          const SizedBox(height: 12),
+                          _buildWeeklyOffs(),
+                          const SizedBox(height: 24),
+
+                          // Dates
+                          _buildDateSelection(),
+                          const SizedBox(height: 24),
+
+                          // Times
+                          _buildTimeSelection(),
+                          const SizedBox(height: 24),
+
+                          // Locations
+                          _buildLocationSelection(),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
           ],
         ),
       ),
@@ -81,38 +100,46 @@ class CreateRosterScreen extends StatelessWidget {
           child: Row(
             children: [
               Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              hoverColor: AppTheme.slate200,
-              onTap: () => Navigator.of(context).pop(),
-              child: const SizedBox(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  hoverColor: AppTheme.slate200,
+                  onTap: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      );
+                    }
+                  },
+                  child: const SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Icon(Icons.arrow_back, color: AppTheme.slate900, size: 24),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Text(
+                  'Create Roster',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.slate900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(
                 width: 40,
                 height: 40,
-                child: Icon(Icons.arrow_back, color: AppTheme.slate900, size: 24),
+                child: Icon(Icons.more_vert, color: AppTheme.slate900, size: 24),
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Text(
-              'Create Roster',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.slate900,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 40,
-            height: 40,
-            child: Icon(Icons.more_vert, color: AppTheme.slate900, size: 24),
-          ),
-        ],
-      ),
-    ),
+        ),
       ),
     );
   }
@@ -150,36 +177,40 @@ class CreateRosterScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(child: _buildDirectionTab('Login', false)),
-          Expanded(child: _buildDirectionTab('Logout', false)),
-          Expanded(child: _buildDirectionTab('Both', true)),
+          Expanded(child: _buildDirectionTab('Login')),
+          Expanded(child: _buildDirectionTab('Logout')),
+          Expanded(child: _buildDirectionTab('Both')),
         ],
       ),
     );
   }
 
-  Widget _buildDirectionTab(String label, bool isSelected) {
-    return Container(
-      decoration: isSelected
-          ? BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            )
-          : null,
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: isSelected ? AppTheme.primary : AppTheme.slate500, // Tailwind: slate-600 logic approx
+  Widget _buildDirectionTab(String label) {
+    final bool isSelected = _selectedDirection == label;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedDirection = label),
+      child: Container(
+        decoration: isSelected
+            ? BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    offset: const Offset(0, 1),
+                    blurRadius: 2,
+                  ),
+                ],
+              )
+            : null,
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? AppTheme.primary : AppTheme.slate500,
+          ),
         ),
       ),
     );
@@ -233,44 +264,39 @@ class CreateRosterScreen extends StatelessWidget {
   }
 
   Widget _buildWeeklyOffs() {
-    final days = [
-      {'label': 'M', 'selected': false},
-      {'label': 'T', 'selected': false},
-      {'label': 'W', 'selected': false},
-      {'label': 'T', 'selected': false},
-      {'label': 'F', 'selected': false},
-      {'label': 'S', 'selected': true},
-      {'label': 'S', 'selected': true},
-    ];
+    final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
       alignment: WrapAlignment.start,
-      children: days.map((day) {
-        final isSelected = day['selected'] as bool;
-        return Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primary : AppTheme.backgroundLight,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: isSelected ? AppTheme.primary : AppTheme.slate200,
-              width: 2,
+      children: List.generate(days.length, (index) {
+        final isSelected = _selectedDays.contains(index);
+        return GestureDetector(
+          onTap: () => _toggleDay(index),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isSelected ? AppTheme.primary : AppTheme.backgroundLight,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected ? AppTheme.primary : AppTheme.slate200,
+                width: 2,
+              ),
             ),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            day['label'] as String,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.white : AppTheme.slate500, // Tailwinds: text-slate-600
+            alignment: Alignment.center,
+            child: Text(
+              days[index],
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.white : AppTheme.slate500,
+              ),
             ),
           ),
         );
-      }).toList(),
+      }),
     );
   }
 
@@ -446,7 +472,15 @@ class CreateRosterScreen extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: () {},
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Roster saved successfully!'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+              Navigator.of(context).pop();
+            },
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

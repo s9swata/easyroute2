@@ -1,10 +1,48 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'home_screen.dart';
 import 'bottom_nav_bar.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late TextEditingController _emergencyContactController;
+  late TextEditingController _landmarkController;
+  late TextEditingController _tpinController;
+  late TextEditingController _addressController;
+
+  @override
+  void initState() {
+    super.initState();
+    _emergencyContactController = TextEditingController(text: '+1 (555) 999-8877');
+    _landmarkController = TextEditingController(text: '');
+    _tpinController = TextEditingController(text: '1234');
+    _addressController = TextEditingController(text: '123 Maple Street, Apt 4B, Silicon Valley, CA 94025');
+  }
+
+  @override
+  void dispose() {
+    _emergencyContactController.dispose();
+    _landmarkController.dispose();
+    _tpinController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  void _onSave() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Profile changes saved successfully!'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +86,9 @@ class ProfileScreen extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
         child: Container(
-          decoration: BoxDecoration(
-            color: AppTheme.backgroundLight.withValues(alpha: 0.8),
-            border: const Border(
+          decoration: const BoxDecoration(
+            color: AppTheme.backgroundLight,
+            border: Border(
               bottom: BorderSide(color: AppTheme.slate200),
             ),
           ),
@@ -69,7 +107,15 @@ class ProfileScreen extends StatelessWidget {
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
-                      onTap: () => Navigator.of(context).pop(),
+                      onTap: () {
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          );
+                        }
+                      },
                       child: Container(
                         width: 40,
                         height: 40,
@@ -90,19 +136,23 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+              InkWell(
+                onTap: _onSave,
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
               ),
@@ -182,20 +232,26 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildFormFields() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0), // px-4
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0), // px-4
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ReadOnlyPhoneField(),
-          SizedBox(height: 24), // gap-6
-          _EditableField(label: 'Emergency Contact', value: '+1 (555) 999-8877', icon: Icons.edit),
-          SizedBox(height: 24),
-          _TPinField(),
-          SizedBox(height: 24),
-          _EditableField(label: 'Locality / Landmark', hint: 'e.g. Near Central Park Tower'),
-          SizedBox(height: 24),
-          _AddressField(),
+          const _ReadOnlyPhoneField(),
+          const SizedBox(height: 24), // gap-6
+          _EditableField(
+              label: 'Emergency Contact',
+              controller: _emergencyContactController,
+              icon: Icons.edit),
+          const SizedBox(height: 24),
+          _TPinField(controller: _tpinController),
+          const SizedBox(height: 24),
+          _EditableField(
+              label: 'Locality / Landmark',
+              controller: _landmarkController,
+              hint: 'e.g. Near Central Park Tower'),
+          const SizedBox(height: 24),
+          _AddressField(controller: _addressController),
         ],
       ),
     );
@@ -217,21 +273,31 @@ class ProfileScreen extends StatelessWidget {
                   color: AppTheme.slate700,
                 ),
               ),
-              Row(
-                children: [
-                  const Icon(Icons.my_location, color: AppTheme.primary, size: 18),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Use GPS Location',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primary,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppTheme.primary,
+              InkWell(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Updating location using GPS...'),
+                      behavior: SnackBarBehavior.floating,
                     ),
-                  ),
-                ],
+                  );
+                },
+                child: Row(
+                  children: [
+                    const Icon(Icons.my_location, color: AppTheme.primary, size: 18),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Use GPS Location',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primary,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppTheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -311,20 +377,27 @@ class ProfileScreen extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save_outlined, color: Colors.white, size: 24),
-            SizedBox(width: 8),
-            Text(
-              'Save Changes',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: _onSave,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.save_outlined, color: Colors.white, size: 24),
+                SizedBox(width: 8),
+                Text(
+                  'Save Changes',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -343,7 +416,8 @@ class _ReadOnlyPhoneField extends StatelessWidget {
           padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             'Mobile Number',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700), // font-semibold
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700), // font-semibold
           ),
         ),
         Container(
@@ -372,11 +446,11 @@ class _ReadOnlyPhoneField extends StatelessWidget {
 
 class _EditableField extends StatelessWidget {
   final String label;
-  final String? value;
+  final TextEditingController controller;
   final String? hint;
   final IconData? icon;
 
-  const _EditableField({required this.label, this.value, this.hint, this.icon});
+  const _EditableField({required this.label, required this.controller, this.hint, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -387,7 +461,8 @@ class _EditableField extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700),
+            style: const TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700),
           ),
         ),
         Container(
@@ -403,7 +478,7 @@ class _EditableField extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  controller: value != null ? TextEditingController(text: value) : null,
+                  controller: controller,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: hint,
@@ -421,8 +496,16 @@ class _EditableField extends StatelessWidget {
   }
 }
 
-class _TPinField extends StatelessWidget {
-  const _TPinField();
+class _TPinField extends StatefulWidget {
+  final TextEditingController controller;
+  const _TPinField({required this.controller});
+
+  @override
+  State<_TPinField> createState() => _TPinFieldState();
+}
+
+class _TPinFieldState extends State<_TPinField> {
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -433,7 +516,8 @@ class _TPinField extends StatelessWidget {
           padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             'T-PIN (Transaction PIN)',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700),
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700),
           ),
         ),
         Container(
@@ -449,19 +533,26 @@ class _TPinField extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  controller: TextEditingController(text: '1234'),
-                  obscureText: true,
+                  controller: widget.controller,
+                  obscureText: _obscureText,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                   ),
                   style: const TextStyle(fontSize: 16, color: AppTheme.slate900),
                 ),
               ),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.visibility_outlined, color: AppTheme.slate400, size: 20),
-                  SizedBox(width: 8),
-                  Icon(Icons.autorenew, color: AppTheme.slate400, size: 20),
+                  IconButton(
+                    onPressed: () => setState(() => _obscureText = !_obscureText),
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      color: AppTheme.slate400,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.autorenew, color: AppTheme.slate400, size: 20),
                 ],
               ),
             ],
@@ -481,7 +572,8 @@ class _TPinField extends StatelessWidget {
 }
 
 class _AddressField extends StatelessWidget {
-  const _AddressField();
+  final TextEditingController controller;
+  const _AddressField({required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -492,7 +584,8 @@ class _AddressField extends StatelessWidget {
           padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             'Home Address',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700),
+            style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.slate700),
           ),
         ),
         Container(
@@ -503,7 +596,7 @@ class _AddressField extends StatelessWidget {
             border: Border.all(color: AppTheme.slate200),
           ),
           child: TextField(
-            controller: TextEditingController(text: '123 Maple Street, Apt 4B, Silicon Valley, CA 94025'),
+            controller: controller,
             maxLines: 3,
             decoration: const InputDecoration(
               border: InputBorder.none,
